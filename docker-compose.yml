@@ -1,0 +1,34 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: barangay
+      MYSQL_USER: barangay
+      MYSQL_PASSWORD: barangay-local
+      MYSQL_ROOT_PASSWORD: root-local
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot-local"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    volumes:
+      - barangay_data:/var/lib/mysql
+  api:
+    build: .
+    environment:
+      APP_NAME: Barangay Information System
+      APP_ENV: local
+      APP_KEY: base64:REPLACE_WITH_PHP_ARTISAN_KEY_GENERATE
+      APP_DEBUG: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: barangay
+      DB_USERNAME: barangay
+      DB_PASSWORD: barangay-local
+    ports: ["8000:8000"]
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  barangay_data: {}
